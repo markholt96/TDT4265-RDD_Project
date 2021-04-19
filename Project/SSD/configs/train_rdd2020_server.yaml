@@ -1,0 +1,22 @@
+MODEL:
+    NUM_CLASSES: 5
+    BACKBONE:
+        NAME: 'basic'
+        PRETRAINED: False
+        OUT_CHANNELS: [128, 256, 128, 128, 64, 64]
+        INPUT_CHANNELS: 3
+INPUT:
+    IMAGE_SIZE: [300, 300]
+DATASETS:
+    TRAIN: ("rdd2020_train",)
+    TEST: ("rdd2020_val", )
+SOLVER:
+    MAX_ITER: 120000
+    GAMMA: 0.1
+    BATCH_SIZE: 16
+    LR: 2e-3
+    AMSGRAD: True
+    WEIGHT_DECAY: 5e-4
+MODEL_SAVE_STEP: 5000
+OUTPUT_DIR: 'outputs/rdd2020_2'
+DATASET_DIR: "/work/datasets"
