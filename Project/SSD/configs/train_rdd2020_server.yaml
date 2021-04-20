@@ -17,6 +17,7 @@ SOLVER:
     LR: 2e-3
     AMSGRAD: True
     WEIGHT_DECAY: 5e-4
+EVAL_STEP: 1500
 MODEL_SAVE_STEP: 5000
 OUTPUT_DIR: 'outputs/rdd2020_2'
 DATASET_DIR: "/work/datasets"
