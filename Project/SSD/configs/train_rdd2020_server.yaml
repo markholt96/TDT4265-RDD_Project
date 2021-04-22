@@ -14,10 +14,10 @@ SOLVER:
     MAX_ITER: 120000
     GAMMA: 0.1
     BATCH_SIZE: 16
-    LR: 2e-3
+    LR: 1e-3
     AMSGRAD: True
     WEIGHT_DECAY: 5e-4
 EVAL_STEP: 1500
 MODEL_SAVE_STEP: 5000
-OUTPUT_DIR: 'outputs/rdd2020_2'
-DATASET_DIR: "/work/datasets"
+OUTPUT_DIR: 'outputs/rdd'
+DATASET_DIR: "datasets"

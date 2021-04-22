@@ -5,7 +5,9 @@ MODEL:
         PRETRAINED: False
         OUT_CHANNELS: [128, 256, 128, 128, 64, 64]
         INPUT_CHANNELS: 3
-
+    PRIORS:
+        MIN_SIZES: [[15, 15], [30, 30], [78, 78], [126, 126], [174, 174], [222, 222]]
+        MAX_SIZES: [[30, 30], [78, 78], [126, 126], [174, 174], [222, 222], [270, 270]]
 INPUT:
     IMAGE_SIZE: [300, 300]
 DATASETS:
@@ -15,10 +17,10 @@ SOLVER:
     MAX_ITER: 120000
     GAMMA: 0.1
     BATCH_SIZE: 16
-    LR: 2e-3
+    LR: 1e-3
     AMSGRAD: True
     WEIGHT_DECAY: 5e-4
 EVAL_STEP: 1500
 MODEL_SAVE_STEP: 5000
-OUTPUT_DIR: 'outputs/rdd2020_2'
+OUTPUT_DIR: 'outputs/rdd'
 DATASET_DIR: "datasets"

@@ -1,0 +1,5 @@
+mAP: 0.0741
+D00 - Linear Longitudinal Crack: 0.2482
+D10 - Linear Lateral Crack: 0.0008
+D20 - Alligator and Other Complex Cracks: 0.0475
+D40 - Pothole   : 0.0000
