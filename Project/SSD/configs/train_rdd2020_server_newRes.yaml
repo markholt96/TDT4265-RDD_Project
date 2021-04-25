@@ -1,0 +1,29 @@
+MODEL:
+    NUM_CLASSES: 5
+    BACKBONE:
+        NAME: 'basic'
+        PRETRAINED: False
+        OUT_CHANNELS: [512, 256, 128, 64]
+    PRIORS:
+        FEATURE_MAPS: [[10, 10],[7, 7], [8, 8], [4, 4]]
+        #FEATURE_MAPS: [[63, 38], [32, 19], [16, 10], [8, 5], [4, 3], [2, 1]]
+        MIN_SIZES: [[51, 51], [102, 102], [189, 189], [276, 276], [363, 363], [450, 450]]
+        MAX_SIZES: [[102, 102], [189, 189], [276, 276], [363, 363], [450, 450], [537, 537]]
+        #MIN_SIZES: [[50,30], [128,76], [206,123], [284,170], [362,217], [440,264]]
+        #MAX_SIZES: [[128,76], [206,123], [284,170], [362,217], [440,264], [525,315]]
+INPUT:
+    IMAGE_SIZE: [512, 512]
+DATASETS:
+    TRAIN: ("rdd2020_train",)
+    TEST: ("rdd2020_val", )
+SOLVER:
+    MAX_ITER: 40000
+    GAMMA: 0.1
+    BATCH_SIZE: 16
+    LR: 1e-3
+    AMSGRAD: True
+    WEIGHT_DECAY: 1e-5
+EVAL_STEP: 1500
+MODEL_SAVE_STEP: 5000
+OUTPUT_DIR: 'outputs/rdd2020'
+DATASET_DIR: "datasets"
