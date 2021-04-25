@@ -23,7 +23,158 @@ class BasicModel(torch.nn.Module):
         self.output_channels = output_channels
         image_channels = cfg.MODEL.BACKBONE.INPUT_CHANNELS
         self.output_feature_shape = cfg.MODEL.PRIORS.FEATURE_MAPS
-        self.model = torchvision.models.googlenet(pretrained=True)
+        
+        self.channel1 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=image_channels,
+                out_channels=64,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.MaxPool2d(
+                kernel_size=2,
+                stride=2
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=64,
+                out_channels=64,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.MaxPool2d(
+                kernel_size=2,
+                stride=2
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=64,
+                out_channels=64,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=64,
+                out_channels=self.output_channels[0],
+                kernel_size=3,
+                stride=2,
+                padding=1
+            )
+        )
+         
+        self.channel2 = nn.Sequential(
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=self.output_channels[0],
+                out_channels=128,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=128,
+                out_channels=self.output_channels[1],
+                kernel_size=3,
+                stride=2,
+                padding=1
+            )
+        )
+        
+        self.channel3 = nn.Sequential(    
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=self.output_channels[1],
+                out_channels=256,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=256,
+                out_channels=self.output_channels[2],
+                kernel_size=3,
+                stride=2,
+                padding=1
+            )
+        )
+        
+        self.channel4 = nn.Sequential(
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=self.output_channels[2],
+                out_channels=256,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=256,
+                out_channels=self.output_channels[3],
+                kernel_size=3,
+                stride=2,
+                padding=1
+            )
+        )
+        
+        self.channel5 = nn.Sequential(    
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=self.output_channels[3],
+                out_channels=256,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=256,
+                out_channels=self.output_channels[4],
+                kernel_size=3,
+                stride=2,
+                padding=1
+            )
+        )
+        
+        self.channel6 = nn.Sequential(    
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=self.output_channels[4],
+                out_channels=128,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=128,
+                out_channels=self.output_channels[5],
+                kernel_size=3,
+                stride=1,
+                padding=0
+            )
+        )
+        
+        self.feature_extractor = nn.Sequential(
+            self.channel1,
+            self.channel2,
+            self.channel3,
+            self.channel4,
+            self.channel5,
+            self.channel6
+        )
 
     def forward(self, x):
         """

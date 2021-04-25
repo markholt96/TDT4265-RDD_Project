@@ -20,18 +20,13 @@ class BasicModel(torch.nn.Module):
     """
     def __init__(self, cfg):
         super().__init__()
-        self.model = models.resnext50_32x4d(pretrained=True, progress=True)
+        self.model = models.resnet34(pretrained=True, progress=True)
         output_channels = cfg.MODEL.BACKBONE.OUT_CHANNELS
         self.output_channels = output_channels
         image_channels = cfg.MODEL.BACKBONE.INPUT_CHANNELS
         self.output_feature_shape = cfg.MODEL.PRIORS.FEATURE_MAPS
 
-        for param in self.model.parameters(): # Freeze all parameters
-            param.requires_grad = False
-        for param in self.model.layer4.parameters(): # Unfreeze the last 5 convolutional
-            param.requires_grad = True # layers
-
-
+        
         self.channel2 = nn.Sequential(
             nn.BatchNorm2d(512),
             nn.ReLU(),
@@ -67,18 +62,39 @@ class BasicModel(torch.nn.Module):
             nn.ReLU(),
             nn.Conv2d(
                 in_channels=512,
-                out_channels=512,
+                out_channels=256,
                 kernel_size=3,
                 stride=2,
                 padding=1
             )
         )
         
-        self.channel4 = nn.Sequential(    
+        self.channel4 = nn.Sequential(
             nn.BatchNorm2d(512),
             nn.ReLU(),
             nn.Conv2d(
                 in_channels=512,
+                out_channels=512,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=512,
+                out_channels=256,
+                kernel_size=3,
+                stride=2,
+                padding=1
+            )
+        )
+        
+        self.channel5 = nn.Sequential(    
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=256,
                 out_channels=256,
                 kernel_size=3,
                 stride=1,
@@ -88,27 +104,6 @@ class BasicModel(torch.nn.Module):
             nn.ReLU(),
             nn.Conv2d(
                 in_channels=256,
-                out_channels=128,
-                kernel_size=3,
-                stride=2,
-                padding=1
-            )
-        )
-        
-        self.channel5 = nn.Sequential(    
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=128,
-                out_channels=128,
-                kernel_size=3,
-                stride=1,
-                padding=1
-            ),
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=128,
                 out_channels=128,
                 kernel_size=3,
                 stride=2,
@@ -137,6 +132,16 @@ class BasicModel(torch.nn.Module):
             )
         )
         
+        self.channel7 = nn.Sequential(
+                self.model.conv1,
+                self.model.bn1,
+                self.model.relu
+        )
+        self.channel8 = nn.Sequential(
+                self.model.maxpool,
+                self.model.bn1,
+                self.model.relu
+        )
         self.feature_extractor = nn.Sequential(
             self.channel2,
             self.channel3,
@@ -144,15 +149,7 @@ class BasicModel(torch.nn.Module):
             self.channel5,
             self.channel6
         )
-        
 
-        #Initialize weights with xavier or Glorot init
-        for channel in self.feature_extractor:
-            for layer in channel:
-                if isinstance(layer, nn.Conv2d):
-                    nn.init.xavier_uniform_(layer.weight)
-                    nn.init.zeros_(layer.bias)
-           
     def forward(self, x):
         """
         The forward functiom should output features with shape:
@@ -167,7 +164,7 @@ class BasicModel(torch.nn.Module):
             shape(-1, output_channels[0], 38, 38),
         """
         out_features = []
-        
+
         x = self.model.conv1(x)
         x = self.model.bn1(x)
         x = self.model.relu(x)
@@ -175,23 +172,26 @@ class BasicModel(torch.nn.Module):
         x = self.model.layer1(x)
         x = self.model.layer2(x)
         out_features.append(x)
-        x = self.channel2(x)
+        x = self.model.layer3(x)
         out_features.append(x)
-        x = self.channel3(x)
+        x = self.model.layer4(x)
         out_features.append(x)
+        x = self.model.avgpool(x)
+        out_features.append(x)
+        """
         x = self.channel4(x)
         out_features.append(x)
         x = self.channel5(x)
         out_features.append(x)
         x = self.channel6(x)
         out_features.append(x)
-
         
         for idx, feature in enumerate(out_features):
             w, h = self.output_feature_shape[idx]
             expected_shape = (self.output_channels[idx], h, w)
             assert feature.shape[1:] == expected_shape, \
                 f"Expected shape: {expected_shape}, got: {feature.shape[1:]} at output IDX: {idx}"
+        """
         return tuple(out_features)
 
 
